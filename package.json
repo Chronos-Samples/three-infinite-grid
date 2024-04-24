@@ -1,0 +1,63 @@
+{
+  "name": "@chronosai/three-infinite-grid",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "author": "Mykhailo Strelnykov",
+  "description": "Infinite Grid",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/three-infinite-grid.umd.cjs",
+  "types": "dist/index.d.ts",
+  "module": "dist/three-infinite-grid.js",
+  "exports": {
+    ".": {
+      "import": "dist/three-infinite-grid.js",
+      "require": "dist/three-infinite-grid.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.2.0",
+    "@commitlint/config-conventional": "19.1.0",
+    "@types/node": "20.11.28",
+    "@typescript-eslint/eslint-plugin": "7.2.0",
+    "@typescript-eslint/parser": "7.2.0",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.1.3",
+    "husky": "9.0.11",
+    "lint-staged": "15.2.2",
+    "prettier": "3.2.5",
+    "typescript": "5.4.2",
+    "vite": "5.1.6"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "dependencies": {
+    "@types/three": "^0.163.0",
+    "lil-gui": "^0.19.2",
+    "three": "^0.163.0",
+    "vite-plugin-css-injected-by-js": "^3.5.0",
+    "vite-plugin-dts": "^3.8.3"
+  },
+  "directories": {
+    "lib": "lib"
+  }
+}
