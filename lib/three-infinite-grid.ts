@@ -92,6 +92,10 @@ export class ThreeInfiniteGrid extends Object3D {
     this.add(this._mesh);
   }
 
+  public get material() {
+    return this._material;
+  }
+
   public set plane(value: PLANE) {
     this._plane = value;
     mesh2Plane(this._mesh, value, this._chunks);
