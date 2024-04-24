@@ -10,7 +10,7 @@ Based on this [article](https://bgolus.medium.com/the-best-darn-grid-shader-yet-
 Install the dependencies
 
 ```bash
-pnpm install three-infinite-grid
+npm install @chronoai/three-infinite-grid
 ```
 
 ## Usage
