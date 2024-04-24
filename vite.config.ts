@@ -15,6 +15,11 @@ export default defineConfig({
       external: ["three", "@types/three"],
     },
   },
+  server: {
+    fs: {
+      deny: [".env", ".env.*", "*.{crt,pem}", ".git"],
+    },
+  },
   plugins: [
     cssInjectedByJsPlugin(),
     dts({
