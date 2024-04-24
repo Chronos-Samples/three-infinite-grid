@@ -85,12 +85,12 @@ vec4 PristineGrid(vec4 uv)
     vec4 bAxisColor = zAxisColor;
 
     if(uPlane == XY_PLANE){
-        aAxisColor = zAxisColor;
+        aAxisColor = xAxisColor;
         bAxisColor = yAxisColor;
     }
 
     if(uPlane == ZY_PLANE){
-        aAxisColor = xAxisColor;
+        aAxisColor = zAxisColor;
         bAxisColor = yAxisColor;
     }
 
