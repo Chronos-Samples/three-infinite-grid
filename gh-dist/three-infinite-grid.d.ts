@@ -1,16 +1,43 @@
 import { PLANE } from './utils';
-import { BufferGeometry, ColorRepresentation, InstancedMesh, Object3D, Vector2 } from 'three';
+import { BufferGeometry, Color, ColorRepresentation, InstancedMesh, Object3D, Vector2 } from 'three';
 
 export type ThreeInfiniteGridOptions = {
-    chunks?: Vector2;
-    plane?: PLANE;
+    chunks: Vector2;
+    plane: PLANE;
+    scale: number;
+    majorGridFactor: number;
+    minorLineWidth: number;
+    majorLineWidth: number;
+    axisLineWidth: number;
+    minorLineColor: ColorRepresentation;
+    majorLineColor: ColorRepresentation;
+    xAxisColor: ColorRepresentation;
+    yAxisColor: ColorRepresentation;
+    zAxisColor: ColorRepresentation;
+    centerColor: ColorRepresentation;
+    opacity: number;
+};
+export declare const DEFAULT_SETTINGS: {
+    chunks: Vector2;
+    plane: PLANE;
+    scale: number;
+    majorGridFactor: number;
+    minorLineWidth: number;
+    majorLineWidth: number;
+    axisLineWidth: number;
+    minorLineColor: Color;
+    majorLineColor: Color;
+    xAxisColor: Color;
+    yAxisColor: Color;
+    zAxisColor: Color;
+    centerColor: Color;
+    opacity: number;
 };
 export declare class ThreeInfiniteGrid extends Object3D {
-    private _mesh;
-    private _chunks;
-    private _plane;
+    private readonly _mesh;
+    private readonly _chunks;
     private _material;
-    constructor({ chunks, plane }: ThreeInfiniteGridOptions);
+    constructor(settings: Partial<ThreeInfiniteGridOptions> | undefined);
     get mesh(): InstancedMesh<BufferGeometry<import('three').NormalBufferAttributes>, import('three').Material | import('three').Material[], import('three').InstancedMeshEventMap>;
     set plane(value: PLANE);
     get plane(): PLANE;

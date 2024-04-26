@@ -1,6 +1,6 @@
 {
   "name": "@chronosai/three-infinite-grid",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "author": "Mykhailo Strelnykov",
@@ -20,6 +20,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build-gh": "tsc && vite build --config=vite-ghpages.config.ts",
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

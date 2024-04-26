@@ -4,6 +4,7 @@ import {
   ColorRepresentation,
   DoubleSide,
   InstancedMesh,
+  IUniform,
   Object3D,
   ShaderMaterial,
   Vector2,
@@ -14,66 +15,69 @@ import vert from "./three-infinite-grid.vert?raw";
 import { mesh2Plane, PLANE } from "./utils";
 
 export type ThreeInfiniteGridOptions = {
-  chunks?: Vector2;
-  plane?: PLANE;
+  chunks: Vector2;
+  plane: PLANE;
+
+  scale: number;
+  majorGridFactor: number;
+  minorLineWidth: number;
+  majorLineWidth: number;
+  axisLineWidth: number;
+  minorLineColor: ColorRepresentation;
+  majorLineColor: ColorRepresentation;
+  xAxisColor: ColorRepresentation;
+  yAxisColor: ColorRepresentation;
+  zAxisColor: ColorRepresentation;
+  centerColor: ColorRepresentation;
+  opacity: number;
+};
+
+export const DEFAULT_SETTINGS = {
+  chunks: new Vector2(100, 100),
+  plane: PLANE.XZ,
+  scale: 1,
+  majorGridFactor: 10,
+  minorLineWidth: 0.01,
+  majorLineWidth: 0.015,
+  axisLineWidth: 0.05,
+  minorLineColor: new Color("#000000"),
+  majorLineColor: new Color("#000000"),
+  xAxisColor: new Color("#ff0000"),
+  yAxisColor: new Color("#00ff00"),
+  zAxisColor: new Color("#0000ff"),
+  centerColor: new Color("#ffff00"),
+  opacity: 1,
 };
 
 export class ThreeInfiniteGrid extends Object3D {
-  private _mesh: InstancedMesh;
-  private _chunks: Vector2 = new Vector2(100, 100);
-  private _plane: PLANE = PLANE.XZ;
+  private readonly _mesh: InstancedMesh;
+  private readonly _chunks: Vector2;
   private _material: ShaderMaterial;
 
-  constructor({ chunks, plane }: ThreeInfiniteGridOptions) {
+  constructor(settings: Partial<ThreeInfiniteGridOptions> | undefined) {
     super();
 
-    if (chunks) this._chunks.copy(chunks);
-    if (plane) this._plane = plane;
+    this._chunks = new Vector2().copy(
+      settings?.chunks || DEFAULT_SETTINGS.chunks,
+    );
+
+    const _settings: ThreeInfiniteGridOptions = Object.assign(
+      {},
+      DEFAULT_SETTINGS,
+      settings,
+    );
+    const _uniforms: { [key: string]: IUniform } = {};
+    (Object.keys(_settings) as Array<keyof ThreeInfiniteGridOptions>).forEach(
+      (propKey) => {
+        const uniformKey = `u${propKey.charAt(0).toUpperCase()}${propKey.slice(1)}`;
+        _uniforms[uniformKey] = { value: _settings[propKey] };
+      },
+    );
 
     const geometry = new BufferGeometry();
     const material = new ShaderMaterial({
       side: DoubleSide,
-      uniforms: {
-        uMajorGridFactor: {
-          value: 10,
-        },
-        uMinorLineWidth: {
-          value: 0.01,
-        },
-        uMajorLineWidth: {
-          value: 0.015,
-        },
-        uAxisLineWidth: {
-          value: 0.05,
-        },
-        uMinorLineColor: {
-          value: new Color("#000000"),
-        },
-        uMajorLineColor: {
-          value: new Color("#000000"),
-        },
-        uXAxisColor: {
-          value: new Color("#ff0000"),
-        },
-        uYAxisColor: {
-          value: new Color("#0000ff"),
-        },
-        uZAxisColor: {
-          value: new Color("#00ff00"),
-        },
-        uCenterColor: {
-          value: new Color("#ffff00"),
-        },
-        uScale: {
-          value: 1,
-        },
-        uOpacity: {
-          value: 0.3,
-        },
-        uPlane: {
-          value: this._plane,
-        },
-      },
+      uniforms: _uniforms,
       vertexShader: vert,
       fragmentShader: frag,
       transparent: true,
@@ -87,7 +91,7 @@ export class ThreeInfiniteGrid extends Object3D {
       this._chunks.x * this._chunks.y,
     );
 
-    mesh2Plane(this._mesh, this._plane, this._chunks);
+    mesh2Plane(this._mesh, this.plane, this._chunks);
 
     this.add(this._mesh);
   }
@@ -97,11 +101,11 @@ export class ThreeInfiniteGrid extends Object3D {
   }
 
   public set plane(value: PLANE) {
-    this._plane = value;
+    this._material.uniforms.uPlane.value = value;
     mesh2Plane(this._mesh, value, this._chunks);
   }
   public get plane() {
-    return this._plane;
+    return this._material.uniforms.uPlane.value;
   }
 
   public set cellSize(value: number) {
