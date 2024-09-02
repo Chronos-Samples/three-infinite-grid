@@ -33,7 +33,7 @@ export type ThreeInfiniteGridOptions = {
 };
 
 export const DEFAULT_SETTINGS = {
-  chunks: new Vector2(100, 100),
+  chunks: new Vector2(300, 300),
   plane: PLANE.XZ,
   scale: 1,
   majorGridFactor: 10,
@@ -85,11 +85,7 @@ export class ThreeInfiniteGrid extends Object3D {
 
     this._material = material;
 
-    this._mesh = new InstancedMesh(
-      geometry,
-      material,
-      this._chunks.x * this._chunks.y,
-    );
+    this._mesh = new InstancedMesh(geometry, material, 1000);
 
     mesh2Plane(this._mesh, this.plane, this._chunks);
 

@@ -2,8 +2,11 @@ import "./style.css";
 
 import {
   AmbientLight,
+  BoxGeometry,
   Color,
   DirectionalLight,
+  Mesh,
+  MeshBasicMaterial,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
@@ -48,6 +51,10 @@ controls.dampingFactor = 0.08;
 
 const ambientLight = new AmbientLight(new Color("#ffffff"), 1.5);
 const directionalLight = new DirectionalLight(new Color("#ffffff"), 1.5);
+
+const cube = new Mesh(new BoxGeometry(1, 1, 1), new MeshBasicMaterial());
+cube.position.set(0, 1, 0);
+scene.add(cube);
 
 scene.add(ambientLight, directionalLight);
 
