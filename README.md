@@ -2,7 +2,7 @@
 
 Three.js extension to visualize customizable antialiased grid
 
-[Demo](https://chronos-samples.github.io/three-infinite-grid/)
+[Demo](https://chronos-samples.github.io/three-infinite-grid/) [Github](https://github.com/Chronos-Samples/three-infinite-grid)
 
 ![screenshot.png](screenshot.png)
 Based on this [article](https://bgolus.medium.com/the-best-darn-grid-shader-yet-727f9278b9d8).
