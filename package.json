@@ -13,8 +13,14 @@
   "module": "dist/three-infinite-grid.js",
   "exports": {
     ".": {
-      "import": "dist/three-infinite-grid.js",
-      "require": "dist/three-infinite-grid.umd.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/three-infinite-grid.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/three-infinite-grid.umd.cjs"
+      }
     }
   },
   "scripts": {
