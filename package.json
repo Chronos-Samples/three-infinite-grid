@@ -64,6 +64,9 @@
     "lil-gui": "^0.19.2",
     "three": "^0.163.0"
   },
+  "peerDependencies": {
+    "three": "^0.163.0"
+  },
   "directories": {
     "lib": "lib"
   }
