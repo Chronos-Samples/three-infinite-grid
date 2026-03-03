@@ -37,7 +37,7 @@
     "@commitlint/cli": "19.2.0",
     "@commitlint/config-conventional": "19.1.0",
     "@types/node": "20.11.28",
-    "@types/three": "^0.163.0",
+    "@types/three": "^0.183.0",
     "@typescript-eslint/eslint-plugin": "7.2.0",
     "@typescript-eslint/parser": "7.2.0",
     "eslint": "8.57.0",
@@ -62,10 +62,10 @@
   },
   "dependencies": {
     "lil-gui": "^0.19.2",
-    "three": "^0.163.0"
+    "three": "^0.183.0"
   },
   "peerDependencies": {
-    "three": "^0.163.0"
+    "three": "^0.183.0"
   },
   "directories": {
     "lib": "lib"

@@ -6,12 +6,11 @@ import {
   Color,
   DirectionalLight,
   Mesh,
-  MeshBasicMaterial,
   PerspectiveCamera,
   Scene,
-  WebGLRenderer,
 } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { MeshMatcapNodeMaterial, WebGPURenderer } from "three/webgpu";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import ThreeInfiniteGrid from "../lib/three-infinite-grid";
 import GUI from "lil-gui";
 
@@ -28,7 +27,7 @@ camera.position.set(10, 10, 10);
 scene.add(camera);
 
 //#region Renderer setup
-const renderer = new WebGLRenderer();
+const renderer = new WebGPURenderer({ antialias: true });
 renderer.setClearColor(new Color("#ffffff"));
 
 const handleResize = () => {
@@ -52,7 +51,10 @@ controls.dampingFactor = 0.08;
 const ambientLight = new AmbientLight(new Color("#ffffff"), 1.5);
 const directionalLight = new DirectionalLight(new Color("#ffffff"), 1.5);
 
-const cube = new Mesh(new BoxGeometry(1, 1, 1), new MeshBasicMaterial());
+const cube = new Mesh(
+  new BoxGeometry(1, 1, 1),
+  new MeshMatcapNodeMaterial({ color: "#ff6161" }),
+);
 cube.position.set(0, 1, 0);
 scene.add(cube);
 
@@ -70,25 +72,25 @@ sizeSettings
   .add(grid, "majorGridFactor")
   .name("Major Grid Factor")
   .min(2)
-  .max(10)
+  .max(20)
   .step(1);
 sizeSettings
   .add(grid, "minorLineWidth")
   .name("Minor Line Width")
   .min(0.001)
-  .max(0.1)
+  .max(1)
   .step(0.001);
 sizeSettings
   .add(grid, "majorLineWidth")
   .name("Major Line Width")
   .min(0.001)
-  .max(0.1)
+  .max(1)
   .step(0.001);
 sizeSettings
   .add(grid, "axisLineWidth")
   .name("Axis Line Width")
   .min(0.001)
-  .max(0.2)
+  .max(1)
   .step(0.001);
 
 const colorSettings = gui.addFolder("Color Settings");
@@ -109,4 +111,10 @@ const loop = () => {
   }
   requestAnimationFrame(loop);
 };
-requestAnimationFrame(loop);
+
+const start = async () => {
+  await renderer.init();
+  requestAnimationFrame(loop);
+};
+
+void start();

@@ -18,6 +18,11 @@ npm install @chronosai/three-infinite-grid
 ## Usage
 
 ```js
+import { WebGPURenderer } from "three/webgpu";
+
+const renderer = new WebGPURenderer({ antialias: true });
+await renderer.init();
+
 /* 
 * chunks - size of grid patches matrix (each patch is 20x20 units size)
 * a hack with instanced mesh, used to gain more precision within UV coordinates.
@@ -27,20 +32,26 @@ const grid = new ThreeInfiniteGrid({
   chunks: new Vector2(100, 100),  //2000x2000 units size     
   plane: PLANE.XZ,
   scale: 1,
-  majorGridFactor: 10,
   minorLineWidth: 0.01,
-  majorLineWidth: 0.015,
-  axisLineWidth: 0.05,
   minorLineColor: new Color("#000000"),
+  majorGridFactor: 5,
+  majorLineWidth: 0.02,
   majorLineColor: new Color("#000000"),
+  axisLineWidth: 0.05,
   xAxisColor: new Color("#ff0000"),
   yAxisColor: new Color("#00ff00"),
   zAxisColor: new Color("#0000ff"),
   centerColor: new Color("#ffff00"),
   opacity: 1,
+  debugWorldAB: false,
 });
 scene.add(grid);
 ```
+
+Major lines are rendered every `majorGridFactor` cells, starting from origin (0).
+`minorLineWidth` and `majorLineWidth` are measured in world units, so changing `scale` only changes square size.
+Axis colors depend on visible plane axes: X is red, Y is green, Z is blue.
+Set `debugWorldAB` to `true` to visualize `worldAB` directly on the plane as tiled RG output (`fract(worldAB)`).
 
 To make it actually "infinite" move the grid object after `orbitControls.target`, e.g:
 

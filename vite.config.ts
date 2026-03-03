@@ -12,7 +12,14 @@ export default defineConfig({
       fileName: "three-infinite-grid",
     },
     rollupOptions: {
-      external: ["three", "@types/three"],
+      external: ["three", "three/webgpu", "three/tsl", "@types/three"],
+      output: {
+        globals: {
+          three: "THREE",
+          "three/webgpu": "THREE",
+          "three/tsl": "THREE",
+        },
+      },
     },
   },
   server: {

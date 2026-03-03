@@ -6,4 +6,5 @@ export declare enum PLANE {
     ZY = 2
 }
 export declare const CHUNK_SIZE = 20;
-export declare const mesh2Plane: (mesh: InstancedMesh, plane: PLANE, chunks: Vector2) => InstancedMesh<import('three').BufferGeometry<import('three').NormalBufferAttributes>, import('three').Material | import('three').Material[], import('three').InstancedMeshEventMap>;
+export declare const createXZPlane: (mesh: InstancedMesh, size: number) => void;
+export declare const mesh2Plane: (mesh: InstancedMesh, plane: PLANE, chunks: Vector2) => InstancedMesh<import('three').BufferGeometry<import('three').NormalBufferAttributes, import('three').BufferGeometryEventMap>, import('three').Material | import('three').Material[], import('three').InstancedMeshEventMap>;

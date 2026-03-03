@@ -36,9 +36,9 @@ export declare const DEFAULT_SETTINGS: {
 export declare class ThreeInfiniteGrid extends Object3D {
     private readonly _mesh;
     private readonly _chunks;
-    private _material;
+    private readonly _uniforms;
     constructor(settings: Partial<ThreeInfiniteGridOptions> | undefined);
-    get mesh(): InstancedMesh<BufferGeometry<import('three').NormalBufferAttributes>, import('three').Material | import('three').Material[], import('three').InstancedMeshEventMap>;
+    get mesh(): InstancedMesh<BufferGeometry<import('three').NormalBufferAttributes, import('three').BufferGeometryEventMap>, import('three').Material | import('three').Material[], import('three').InstancedMeshEventMap>;
     set plane(value: PLANE);
     get plane(): PLANE;
     set cellSize(value: number);
