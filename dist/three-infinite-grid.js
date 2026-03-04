@@ -1,8 +1,7 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { Float32BufferAttribute, Euler, MathUtils, Matrix4, Vector3, Quaternion, Color, Vector2, Object3D, BufferGeometry, DoubleSide, InstancedMesh } from "three";
-import { MeshBasicNodeMaterial } from "three/webgpu";
+import { Float32BufferAttribute, Euler, MathUtils, Matrix4, Vector3, Quaternion, Color, Vector2, Object3D, BufferGeometry, MeshBasicNodeMaterial, DoubleSide, InstancedMesh } from "three/webgpu";
 import { select, vec3, positionWorld, vec2, max, clamp, dFdx, dFdy, length, smoothstep, vec4, mix, fract, uniform, abs } from "three/tsl";
 var PLANE = /* @__PURE__ */ ((PLANE2) => {
   PLANE2[PLANE2["XZ"] = 0] = "XZ";
@@ -113,7 +112,6 @@ const createXZPlane = (mesh, size) => {
 };
 const mesh2Plane = (mesh, plane, chunks) => {
   const geometry = mesh.geometry;
-  debugger;
   geometry.setIndex([0, 1, 2, 0, 2, 3]);
   geometry.setAttribute(
     "uv",

@@ -1,5 +1,5 @@
 import { PLANE } from './utils';
-import { BufferGeometry, Color, ColorRepresentation, InstancedMesh, Object3D, Vector2 } from 'three';
+import { BufferGeometry, Color, ColorRepresentation, InstancedMesh, Object3D, Vector2 } from 'three/webgpu';
 
 export type ThreeInfiniteGridOptions = {
     chunks: Vector2;
@@ -40,7 +40,7 @@ export declare class ThreeInfiniteGrid extends Object3D {
     private readonly _chunks;
     private readonly _uniforms;
     constructor(settings: Partial<ThreeInfiniteGridOptions> | undefined);
-    get mesh(): InstancedMesh<BufferGeometry<import('three').NormalBufferAttributes, import('three').BufferGeometryEventMap>, import('three').Material | import('three').Material[], import('three').InstancedMeshEventMap>;
+    get mesh(): InstancedMesh<BufferGeometry<import('three/webgpu').NormalBufferAttributes, import('three/webgpu').BufferGeometryEventMap>, import('three/webgpu').Material | import('three/webgpu').Material[], import('three/webgpu').InstancedMeshEventMap>;
     set plane(value: PLANE);
     get plane(): PLANE;
     set cellSize(value: number);

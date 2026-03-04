@@ -1,6 +1,6 @@
 (function(global, factory) {
-  typeof exports === "object" && typeof module !== "undefined" ? factory(exports, require("three"), require("three/webgpu"), require("three/tsl")) : typeof define === "function" && define.amd ? define(["exports", "three", "three/webgpu", "three/tsl"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global["three-infinite-grid"] = {}, global.THREE, global.THREE, global.THREE));
-})(this, function(exports2, three, webgpu, tsl) {
+  typeof exports === "object" && typeof module !== "undefined" ? factory(exports, require("three/webgpu"), require("three/tsl")) : typeof define === "function" && define.amd ? define(["exports", "three/webgpu", "three/tsl"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global["three-infinite-grid"] = {}, global.THREE, global.THREE));
+})(this, function(exports2, webgpu, tsl) {
   "use strict";var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
@@ -27,15 +27,15 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   const createXZPlane = (mesh, size) => {
     const { iterations, initialSize } = getPlaneParameters(size);
     const geometry = mesh.geometry;
-    const m = new three.Matrix4();
-    const vPos = new three.Vector3();
-    const quaternion = new three.Quaternion().identity();
-    const vScale = new three.Vector3(1, 1, 1);
+    const m = new webgpu.Matrix4();
+    const vPos = new webgpu.Vector3();
+    const quaternion = new webgpu.Quaternion().identity();
+    const vScale = new webgpu.Vector3(1, 1, 1);
     geometry.setFromPoints([
-      new three.Vector3(0, 0, 0),
-      new three.Vector3(initialSize, 0, 0),
-      new three.Vector3(initialSize, 0, initialSize),
-      new three.Vector3(0, 0, initialSize)
+      new webgpu.Vector3(0, 0, 0),
+      new webgpu.Vector3(initialSize, 0, 0),
+      new webgpu.Vector3(initialSize, 0, initialSize),
+      new webgpu.Vector3(0, 0, initialSize)
     ]);
     let currentOffset = 0;
     vPos.set(-initialSize / 2, 0, -initialSize / 2);
@@ -114,25 +114,24 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   };
   const mesh2Plane = (mesh, plane, chunks) => {
     const geometry = mesh.geometry;
-    debugger;
     geometry.setIndex([0, 1, 2, 0, 2, 3]);
     geometry.setAttribute(
       "uv",
-      new three.Float32BufferAttribute(new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]), 2)
+      new webgpu.Float32BufferAttribute(new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]), 2)
     );
     createXZPlane(mesh, chunks.x * CHUNK_SIZE);
     switch (plane) {
       case 0: {
-        mesh.setRotationFromEuler(new three.Euler(0, 0, 0));
+        mesh.setRotationFromEuler(new webgpu.Euler(0, 0, 0));
         break;
       }
       case 1: {
-        mesh.setRotationFromEuler(new three.Euler(90 * three.MathUtils.DEG2RAD, 0, 0));
+        mesh.setRotationFromEuler(new webgpu.Euler(90 * webgpu.MathUtils.DEG2RAD, 0, 0));
         break;
       }
       case 2: {
         mesh.setRotationFromEuler(
-          new three.Euler(-90 * three.MathUtils.DEG2RAD, 0, 90 * three.MathUtils.DEG2RAD)
+          new webgpu.Euler(-90 * webgpu.MathUtils.DEG2RAD, 0, 90 * webgpu.MathUtils.DEG2RAD)
         );
       }
     }
@@ -140,19 +139,19 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     return mesh;
   };
   const DEFAULT_SETTINGS = {
-    chunks: new three.Vector2(300, 300),
+    chunks: new webgpu.Vector2(300, 300),
     plane: PLANE.XZ,
     scale: 1,
     minorLineWidth: 0.01,
-    minorLineColor: new three.Color("#000000"),
+    minorLineColor: new webgpu.Color("#000000"),
     majorGridFactor: 5,
     majorLineWidth: 0.02,
-    majorLineColor: new three.Color("#000000"),
+    majorLineColor: new webgpu.Color("#000000"),
     axisLineWidth: 0.05,
-    xAxisColor: new three.Color("#ff0000"),
-    yAxisColor: new three.Color("#00ff00"),
-    zAxisColor: new three.Color("#0000ff"),
-    centerColor: new three.Color("#ffff00"),
+    xAxisColor: new webgpu.Color("#ff0000"),
+    yAxisColor: new webgpu.Color("#00ff00"),
+    zAxisColor: new webgpu.Color("#0000ff"),
+    centerColor: new webgpu.Color("#ffff00"),
     opacity: 1,
     debugWorldAB: false
   };
@@ -164,25 +163,25 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     uPlane: floatU(settings.plane),
     uScale: floatU(settings.scale),
     uLineWidth: floatU(settings.minorLineWidth),
-    uLineColor: colorU(new three.Color(settings.minorLineColor)),
+    uLineColor: colorU(new webgpu.Color(settings.minorLineColor)),
     uMajorGridFactor: floatU(settings.majorGridFactor),
     uMajorLineWidth: floatU(settings.majorLineWidth),
-    uMajorLineColor: colorU(new three.Color(settings.majorLineColor)),
+    uMajorLineColor: colorU(new webgpu.Color(settings.majorLineColor)),
     uAxisLineWidth: floatU(settings.axisLineWidth),
-    uXAxisColor: colorU(new three.Color(settings.xAxisColor)),
-    uYAxisColor: colorU(new three.Color(settings.yAxisColor)),
-    uZAxisColor: colorU(new three.Color(settings.zAxisColor)),
-    uCenterColor: colorU(new three.Color(settings.centerColor)),
+    uXAxisColor: colorU(new webgpu.Color(settings.xAxisColor)),
+    uYAxisColor: colorU(new webgpu.Color(settings.yAxisColor)),
+    uZAxisColor: colorU(new webgpu.Color(settings.zAxisColor)),
+    uCenterColor: colorU(new webgpu.Color(settings.centerColor)),
     uOpacity: floatU(settings.opacity),
     uDebugWorldAB: floatU(settings.debugWorldAB ? 1 : 0)
   });
-  class ThreeInfiniteGrid extends three.Object3D {
+  class ThreeInfiniteGrid extends webgpu.Object3D {
     constructor(settings) {
       super();
       __publicField(this, "_mesh");
       __publicField(this, "_chunks");
       __publicField(this, "_uniforms");
-      this._chunks = new three.Vector2().copy(
+      this._chunks = new webgpu.Vector2().copy(
         (settings == null ? void 0 : settings.chunks) || DEFAULT_SETTINGS.chunks
       );
       const _settings = Object.assign(
@@ -194,13 +193,13 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       _settings.majorLineWidth = clampLineWidthValue(_settings.majorLineWidth);
       _settings.axisLineWidth = clampLineWidthValue(_settings.axisLineWidth);
       this._uniforms = createGridUniforms(_settings);
-      const geometry = new three.BufferGeometry();
+      const geometry = new webgpu.BufferGeometry();
       const material = new webgpu.MeshBasicNodeMaterial({
-        side: three.DoubleSide,
+        side: webgpu.DoubleSide,
         transparent: true
       });
       material.fragmentNode = buildGridNode(this._uniforms);
-      this._mesh = new three.InstancedMesh(geometry, material, 1e3);
+      this._mesh = new webgpu.InstancedMesh(geometry, material, 1e3);
       mesh2Plane(this._mesh, this.plane, this._chunks);
       this.add(this._mesh);
     }
@@ -228,7 +227,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       return this._uniforms.uLineWidth.value;
     }
     set minorLineColor(value) {
-      this._uniforms.uLineColor.value = new three.Color(value);
+      this._uniforms.uLineColor.value = new webgpu.Color(value);
     }
     get minorLineColor() {
       return this._uniforms.uLineColor.value;
@@ -246,7 +245,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       return this._uniforms.uMajorLineWidth.value;
     }
     set majorLineColor(value) {
-      this._uniforms.uMajorLineColor.value = new three.Color(value);
+      this._uniforms.uMajorLineColor.value = new webgpu.Color(value);
     }
     get majorLineColor() {
       return this._uniforms.uMajorLineColor.value;
@@ -258,25 +257,25 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       return this._uniforms.uAxisLineWidth.value;
     }
     set xAxisColor(value) {
-      this._uniforms.uXAxisColor.value = new three.Color(value);
+      this._uniforms.uXAxisColor.value = new webgpu.Color(value);
     }
     get xAxisColor() {
       return this._uniforms.uXAxisColor.value;
     }
     set yAxisColor(value) {
-      this._uniforms.uYAxisColor.value = new three.Color(value);
+      this._uniforms.uYAxisColor.value = new webgpu.Color(value);
     }
     get yAxisColor() {
       return this._uniforms.uYAxisColor.value;
     }
     set zAxisColor(value) {
-      this._uniforms.uZAxisColor.value = new three.Color(value);
+      this._uniforms.uZAxisColor.value = new webgpu.Color(value);
     }
     get zAxisColor() {
       return this._uniforms.uZAxisColor.value;
     }
     set centerColor(value) {
-      this._uniforms.uCenterColor.value = new three.Color(value);
+      this._uniforms.uCenterColor.value = new webgpu.Color(value);
     }
     get centerColor() {
       return this._uniforms.uCenterColor.value;

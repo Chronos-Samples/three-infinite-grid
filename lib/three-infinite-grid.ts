@@ -6,8 +6,8 @@ import {
   InstancedMesh,
   Object3D,
   Vector2,
-} from "three";
-import { MeshBasicNodeMaterial } from "three/webgpu";
+  MeshBasicNodeMaterial,
+} from "three/webgpu";
 import {
   abs,
   clamp,

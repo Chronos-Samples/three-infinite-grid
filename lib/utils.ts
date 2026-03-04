@@ -7,7 +7,7 @@ import {
   Quaternion,
   Vector2,
   Vector3,
-} from "three";
+} from "three/webgpu";
 
 export enum PLANE {
   XZ,
@@ -149,9 +149,6 @@ export const mesh2Plane = (
   chunks: Vector2,
 ) => {
   const geometry = mesh.geometry;
-
-  debugger;
-
   geometry.setIndex([0, 1, 2, 0, 2, 3]);
   geometry.setAttribute(
     "uv",
