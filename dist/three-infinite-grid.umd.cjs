@@ -114,6 +114,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   };
   const mesh2Plane = (mesh, plane, chunks) => {
     const geometry = mesh.geometry;
+    debugger;
     geometry.setIndex([0, 1, 2, 0, 2, 3]);
     geometry.setAttribute(
       "uv",

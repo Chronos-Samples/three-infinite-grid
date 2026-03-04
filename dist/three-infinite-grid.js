@@ -113,6 +113,7 @@ const createXZPlane = (mesh, size) => {
 };
 const mesh2Plane = (mesh, plane, chunks) => {
   const geometry = mesh.geometry;
+  debugger;
   geometry.setIndex([0, 1, 2, 0, 2, 3]);
   geometry.setAttribute(
     "uv",
