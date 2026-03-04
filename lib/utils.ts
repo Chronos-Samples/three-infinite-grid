@@ -150,6 +150,8 @@ export const mesh2Plane = (
 ) => {
   const geometry = mesh.geometry;
 
+  debugger;
+
   geometry.setIndex([0, 1, 2, 0, 2, 3]);
   geometry.setAttribute(
     "uv",
