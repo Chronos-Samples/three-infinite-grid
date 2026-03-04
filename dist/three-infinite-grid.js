@@ -1,385 +1,520 @@
-var te = Object.defineProperty;
-var ie = (o, a, e) => a in o ? te(o, a, { enumerable: !0, configurable: !0, writable: !0, value: e }) : o[a] = e;
-var R = (o, a, e) => ie(o, typeof a != "symbol" ? a + "" : a, e);
-import { Float32BufferAttribute as ne, Euler as ro, MathUtils as so, Matrix4 as re, Vector3 as F, Quaternion as se, Color as c, Vector2 as go, Object3D as ae, BufferGeometry as ue, DoubleSide as le, InstancedMesh as ce } from "three";
-import { MeshBasicNodeMaterial as de } from "three/webgpu";
-import { select as i, vec3 as ao, positionWorld as me, vec2 as d, max as s, clamp as _, dFdx as vo, dFdy as _o, length as V, smoothstep as E, vec4 as p, mix as b, fract as yo, uniform as Bo, abs as xe } from "three/tsl";
-var H = /* @__PURE__ */ ((o) => (o[o.XZ = 0] = "XZ", o[o.XY = 1] = "XY", o[o.ZY = 2] = "ZY", o))(H || {});
-const Do = 20, he = (o) => {
-  let a = 0, e = o;
-  for (; e > Do; )
-    a++, e = Math.round(e / 3 * 1e3) / 1e3;
-  return { iterations: a, initialSize: e };
-}, Ae = (o, a) => o * Math.pow(3, a), fe = (o, a) => {
-  const { iterations: e, initialSize: t } = he(a), Y = o.geometry, n = new re(), r = new F(), M = new se().identity(), u = new F(1, 1, 1);
-  Y.setFromPoints([
-    new F(0, 0, 0),
-    new F(t, 0, 0),
-    new F(t, 0, t),
-    new F(0, 0, t)
-  ]);
-  let m = 0;
-  r.set(-t / 2, 0, -t / 2), n.compose(r, M, u), o.setMatrixAt(0, n);
-  let l = 1;
-  for (let x = 0; x <= e; x++) {
-    const h = Ae(t, x);
-    m += h, r.set(-m - t / 2, 0, -h / 2), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(
-      -m - t / 2,
-      0,
-      -m - t / 2
-    ), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(-h / 2, 0, -m - t / 2), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(
-      m - h + t / 2,
-      0,
-      -m - t / 2
-    ), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(
-      m - h + t / 2,
-      0,
-      -h / 2
-    ), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(
-      m - h + t / 2,
-      0,
-      m - h + t / 2
-    ), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(
-      -h / 2,
-      0,
-      m - h + t / 2
-    ), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++, r.set(
-      -m - t / 2,
-      0,
-      m - h + t / 2
-    ), u.setScalar(Math.pow(3, x)), n.compose(r, M, u), o.setMatrixAt(l, n), l++;
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+import { Float32BufferAttribute, Euler, MathUtils, Matrix4, Vector3, Quaternion, Color, Vector2, Object3D, BufferGeometry, DoubleSide, InstancedMesh } from "three";
+import { MeshBasicNodeMaterial } from "three/webgpu";
+import { select, vec3, positionWorld, vec2, max, clamp, dFdx, dFdy, length, smoothstep, vec4, mix, fract, uniform, abs } from "three/tsl";
+var PLANE = /* @__PURE__ */ ((PLANE2) => {
+  PLANE2[PLANE2["XZ"] = 0] = "XZ";
+  PLANE2[PLANE2["XY"] = 1] = "XY";
+  PLANE2[PLANE2["ZY"] = 2] = "ZY";
+  return PLANE2;
+})(PLANE || {});
+const CHUNK_SIZE = 20;
+const getPlaneParameters = (size) => {
+  let iterations = 0;
+  let currentSize = size;
+  while (currentSize > CHUNK_SIZE) {
+    iterations++;
+    currentSize = Math.round(currentSize / 3 * 1e3) / 1e3;
   }
-  o.count = l;
-}, bo = (o, a, e) => {
-  const t = o.geometry;
-  switch (t.setIndex([0, 1, 2, 0, 2, 3]), t.setAttribute(
+  return { iterations, initialSize: currentSize };
+};
+const getIterationSize = (initialSize, iteration) => {
+  return initialSize * Math.pow(3, iteration);
+};
+const createXZPlane = (mesh, size) => {
+  const { iterations, initialSize } = getPlaneParameters(size);
+  const geometry = mesh.geometry;
+  const m = new Matrix4();
+  const vPos = new Vector3();
+  const quaternion = new Quaternion().identity();
+  const vScale = new Vector3(1, 1, 1);
+  geometry.setFromPoints([
+    new Vector3(0, 0, 0),
+    new Vector3(initialSize, 0, 0),
+    new Vector3(initialSize, 0, initialSize),
+    new Vector3(0, 0, initialSize)
+  ]);
+  let currentOffset = 0;
+  vPos.set(-initialSize / 2, 0, -initialSize / 2);
+  m.compose(vPos, quaternion, vScale);
+  mesh.setMatrixAt(0, m);
+  let matrixIndex = 1;
+  for (let i = 0; i <= iterations; i++) {
+    const iterationQuadSize = getIterationSize(initialSize, i);
+    currentOffset += iterationQuadSize;
+    vPos.set(-currentOffset - initialSize / 2, 0, -iterationQuadSize / 2);
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(
+      -currentOffset - initialSize / 2,
+      0,
+      -currentOffset - initialSize / 2
+    );
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(-iterationQuadSize / 2, 0, -currentOffset - initialSize / 2);
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(
+      currentOffset - iterationQuadSize + initialSize / 2,
+      0,
+      -currentOffset - initialSize / 2
+    );
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(
+      currentOffset - iterationQuadSize + initialSize / 2,
+      0,
+      -iterationQuadSize / 2
+    );
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(
+      currentOffset - iterationQuadSize + initialSize / 2,
+      0,
+      currentOffset - iterationQuadSize + initialSize / 2
+    );
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(
+      -iterationQuadSize / 2,
+      0,
+      currentOffset - iterationQuadSize + initialSize / 2
+    );
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+    vPos.set(
+      -currentOffset - initialSize / 2,
+      0,
+      currentOffset - iterationQuadSize + initialSize / 2
+    );
+    vScale.setScalar(Math.pow(3, i));
+    m.compose(vPos, quaternion, vScale);
+    mesh.setMatrixAt(matrixIndex, m);
+    matrixIndex++;
+  }
+  mesh.count = matrixIndex;
+};
+const mesh2Plane = (mesh, plane, chunks) => {
+  const geometry = mesh.geometry;
+  geometry.setIndex([0, 1, 2, 0, 2, 3]);
+  geometry.setAttribute(
     "uv",
-    new ne(new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]), 2)
-  ), fe(o, e.x * Do), a) {
+    new Float32BufferAttribute(new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]), 2)
+  );
+  createXZPlane(mesh, chunks.x * CHUNK_SIZE);
+  switch (plane) {
     case 0: {
-      o.setRotationFromEuler(new ro(0, 0, 0));
+      mesh.setRotationFromEuler(new Euler(0, 0, 0));
       break;
     }
     case 1: {
-      o.setRotationFromEuler(new ro(90 * so.DEG2RAD, 0, 0));
+      mesh.setRotationFromEuler(new Euler(90 * MathUtils.DEG2RAD, 0, 0));
       break;
     }
-    case 2:
-      o.setRotationFromEuler(
-        new ro(-90 * so.DEG2RAD, 0, 90 * so.DEG2RAD)
+    case 2: {
+      mesh.setRotationFromEuler(
+        new Euler(-90 * MathUtils.DEG2RAD, 0, 90 * MathUtils.DEG2RAD)
       );
+    }
   }
-  return o.instanceMatrix.needsUpdate = !0, o;
-}, jo = {
-  chunks: new go(300, 300),
-  plane: H.XZ,
+  mesh.instanceMatrix.needsUpdate = true;
+  return mesh;
+};
+const DEFAULT_SETTINGS = {
+  chunks: new Vector2(300, 300),
+  plane: PLANE.XZ,
   scale: 1,
   minorLineWidth: 0.01,
-  minorLineColor: new c("#000000"),
+  minorLineColor: new Color("#000000"),
   majorGridFactor: 5,
   majorLineWidth: 0.02,
-  majorLineColor: new c("#000000"),
+  majorLineColor: new Color("#000000"),
   axisLineWidth: 0.05,
-  xAxisColor: new c("#ff0000"),
-  yAxisColor: new c("#00ff00"),
-  zAxisColor: new c("#0000ff"),
-  centerColor: new c("#ffff00"),
+  xAxisColor: new Color("#ff0000"),
+  yAxisColor: new Color("#00ff00"),
+  zAxisColor: new Color("#0000ff"),
+  centerColor: new Color("#ffff00"),
   opacity: 1,
-  debugWorldAB: !1
-}, y = (o) => Bo(o), X = (o) => Bo(o), f = 1e-6, k = (o) => Math.max(o, 0), Me = (o) => ({
-  uPlane: y(o.plane),
-  uScale: y(o.scale),
-  uLineWidth: y(o.minorLineWidth),
-  uLineColor: X(new c(o.minorLineColor)),
-  uMajorGridFactor: y(o.majorGridFactor),
-  uMajorLineWidth: y(o.majorLineWidth),
-  uMajorLineColor: X(new c(o.majorLineColor)),
-  uAxisLineWidth: y(o.axisLineWidth),
-  uXAxisColor: X(new c(o.xAxisColor)),
-  uYAxisColor: X(new c(o.yAxisColor)),
-  uZAxisColor: X(new c(o.zAxisColor)),
-  uCenterColor: X(new c(o.centerColor)),
-  uOpacity: y(o.opacity),
-  uDebugWorldAB: y(o.debugWorldAB ? 1 : 0)
+  debugWorldAB: false
+};
+const floatU = (value) => uniform(value);
+const colorU = (value) => uniform(value);
+const WIDTH_EPSILON = 1e-6;
+const clampLineWidthValue = (value) => Math.max(value, 0);
+const createGridUniforms = (settings) => ({
+  uPlane: floatU(settings.plane),
+  uScale: floatU(settings.scale),
+  uLineWidth: floatU(settings.minorLineWidth),
+  uLineColor: colorU(new Color(settings.minorLineColor)),
+  uMajorGridFactor: floatU(settings.majorGridFactor),
+  uMajorLineWidth: floatU(settings.majorLineWidth),
+  uMajorLineColor: colorU(new Color(settings.majorLineColor)),
+  uAxisLineWidth: floatU(settings.axisLineWidth),
+  uXAxisColor: colorU(new Color(settings.xAxisColor)),
+  uYAxisColor: colorU(new Color(settings.yAxisColor)),
+  uZAxisColor: colorU(new Color(settings.zAxisColor)),
+  uCenterColor: colorU(new Color(settings.centerColor)),
+  uOpacity: floatU(settings.opacity),
+  uDebugWorldAB: floatU(settings.debugWorldAB ? 1 : 0)
 });
-class ve extends ae {
-  constructor(e) {
+class ThreeInfiniteGrid extends Object3D {
+  constructor(settings) {
     super();
-    R(this, "_mesh");
-    R(this, "_chunks");
-    R(this, "_uniforms");
-    this._chunks = new go().copy(
-      (e == null ? void 0 : e.chunks) || jo.chunks
+    __publicField(this, "_mesh");
+    __publicField(this, "_chunks");
+    __publicField(this, "_uniforms");
+    this._chunks = new Vector2().copy(
+      (settings == null ? void 0 : settings.chunks) || DEFAULT_SETTINGS.chunks
     );
-    const t = Object.assign(
+    const _settings = Object.assign(
       {},
-      jo,
-      e
+      DEFAULT_SETTINGS,
+      settings
     );
-    t.minorLineWidth = k(t.minorLineWidth), t.majorLineWidth = k(t.majorLineWidth), t.axisLineWidth = k(t.axisLineWidth), this._uniforms = Me(t);
-    const Y = new ue(), n = new de({
-      side: le,
-      transparent: !0
+    _settings.minorLineWidth = clampLineWidthValue(_settings.minorLineWidth);
+    _settings.majorLineWidth = clampLineWidthValue(_settings.majorLineWidth);
+    _settings.axisLineWidth = clampLineWidthValue(_settings.axisLineWidth);
+    this._uniforms = createGridUniforms(_settings);
+    const geometry = new BufferGeometry();
+    const material = new MeshBasicNodeMaterial({
+      side: DoubleSide,
+      transparent: true
     });
-    n.fragmentNode = Ce(this._uniforms), this._mesh = new ce(Y, n, 1e3), bo(this._mesh, this.plane, this._chunks), this.add(this._mesh);
+    material.fragmentNode = buildGridNode(this._uniforms);
+    this._mesh = new InstancedMesh(geometry, material, 1e3);
+    mesh2Plane(this._mesh, this.plane, this._chunks);
+    this.add(this._mesh);
   }
   get mesh() {
     return this._mesh;
   }
-  set plane(e) {
-    this._uniforms.uPlane.value = e, bo(this._mesh, e, this._chunks);
+  set plane(value) {
+    this._uniforms.uPlane.value = value;
+    mesh2Plane(this._mesh, value, this._chunks);
   }
   get plane() {
     return this._uniforms.uPlane.value;
   }
-  set cellSize(e) {
-    this._uniforms.uScale.value = e;
+  set cellSize(value) {
+    this._uniforms.uScale.value = value;
   }
   get cellSize() {
     return this._uniforms.uScale.value;
   }
-  set minorLineWidth(e) {
-    const t = k(e);
-    this._uniforms.uLineWidth.value = t;
+  set minorLineWidth(value) {
+    const nextLineWidth = clampLineWidthValue(value);
+    this._uniforms.uLineWidth.value = nextLineWidth;
   }
   get minorLineWidth() {
     return this._uniforms.uLineWidth.value;
   }
-  set minorLineColor(e) {
-    this._uniforms.uLineColor.value = new c(e);
+  set minorLineColor(value) {
+    this._uniforms.uLineColor.value = new Color(value);
   }
   get minorLineColor() {
     return this._uniforms.uLineColor.value;
   }
-  set majorGridFactor(e) {
-    this._uniforms.uMajorGridFactor.value = Math.max(2, e);
+  set majorGridFactor(value) {
+    this._uniforms.uMajorGridFactor.value = Math.max(2, value);
   }
   get majorGridFactor() {
     return this._uniforms.uMajorGridFactor.value;
   }
-  set majorLineWidth(e) {
-    this._uniforms.uMajorLineWidth.value = e;
+  set majorLineWidth(value) {
+    this._uniforms.uMajorLineWidth.value = value;
   }
   get majorLineWidth() {
     return this._uniforms.uMajorLineWidth.value;
   }
-  set majorLineColor(e) {
-    this._uniforms.uMajorLineColor.value = new c(e);
+  set majorLineColor(value) {
+    this._uniforms.uMajorLineColor.value = new Color(value);
   }
   get majorLineColor() {
     return this._uniforms.uMajorLineColor.value;
   }
-  set axisLineWidth(e) {
-    this._uniforms.uAxisLineWidth.value = k(e);
+  set axisLineWidth(value) {
+    this._uniforms.uAxisLineWidth.value = clampLineWidthValue(value);
   }
   get axisLineWidth() {
     return this._uniforms.uAxisLineWidth.value;
   }
-  set xAxisColor(e) {
-    this._uniforms.uXAxisColor.value = new c(e);
+  set xAxisColor(value) {
+    this._uniforms.uXAxisColor.value = new Color(value);
   }
   get xAxisColor() {
     return this._uniforms.uXAxisColor.value;
   }
-  set yAxisColor(e) {
-    this._uniforms.uYAxisColor.value = new c(e);
+  set yAxisColor(value) {
+    this._uniforms.uYAxisColor.value = new Color(value);
   }
   get yAxisColor() {
     return this._uniforms.uYAxisColor.value;
   }
-  set zAxisColor(e) {
-    this._uniforms.uZAxisColor.value = new c(e);
+  set zAxisColor(value) {
+    this._uniforms.uZAxisColor.value = new Color(value);
   }
   get zAxisColor() {
     return this._uniforms.uZAxisColor.value;
   }
-  set centerColor(e) {
-    this._uniforms.uCenterColor.value = new c(e);
+  set centerColor(value) {
+    this._uniforms.uCenterColor.value = new Color(value);
   }
   get centerColor() {
     return this._uniforms.uCenterColor.value;
   }
-  set opacity(e) {
-    this._uniforms.uOpacity.value = Math.max(Math.min(e, 1), 0);
+  set opacity(value) {
+    this._uniforms.uOpacity.value = Math.max(Math.min(value, 1), 0);
   }
   get opacity() {
     return this._uniforms.uOpacity.value;
   }
-  set debugWorldAB(e) {
-    this._uniforms.uDebugWorldAB.value = e ? 1 : 0;
+  set debugWorldAB(value) {
+    this._uniforms.uDebugWorldAB.value = value ? 1 : 0;
   }
   get debugWorldAB() {
     return this._uniforms.uDebugWorldAB.value > 0.5;
   }
 }
-const Ce = (o) => {
-  const a = (G, T, z) => d(
-    E(G.x, T.x, z.x),
-    E(G.y, T.y, z.y)
-  ), {
-    uPlane: e,
-    uScale: t,
-    uLineWidth: Y,
-    uLineColor: n,
-    uMajorGridFactor: r,
-    uMajorLineWidth: M,
-    uMajorLineColor: u,
-    uAxisLineWidth: m,
-    uXAxisColor: l,
-    uYAxisColor: x,
-    uZAxisColor: h,
-    uCenterColor: So,
-    uOpacity: Go,
-    uDebugWorldAB: zo
-  } = o, L = e.equal(H.XY), w = e.equal(H.ZY), j = me, A = i(
-    L,
-    ao(j.x, j.y, 0),
-    i(
-      w,
-      ao(0, j.y, j.z),
-      ao(j.x, 0, j.z)
-    )
-  ), q = i(
-    L,
-    d(A.x, A.y),
-    i(
-      w,
-      d(A.z, A.y),
-      d(A.x, A.z)
-    )
-  ), K = s(t, 1e-6), Fo = s(r, 2), uo = s(K.mul(Fo), 1e-6), lo = (G, T) => {
-    const z = _(T, 0, 1), U = p(vo(G), _o(G)), to = d(
-      V(d(U.x, U.z)),
-      V(d(U.y, U.w))
-    ), io = z.greaterThan(0.5), I = i(
-      io,
-      z.oneMinus(),
-      z
-    ), wo = d(I, I), no = _(
-      wo,
-      to,
-      d(0.5)
-    ), Wo = s(to, d(1e-6)).mul(1.5);
-    let O = xe(yo(G).mul(2).sub(1));
-    O = i(io, O, O.oneMinus());
-    let W = a(
-      no.add(Wo),
-      no.sub(Wo),
-      O
-    );
-    W = W.mul(
-      _(wo.div(no), d(0), d(1))
-    );
-    const Lo = _(
-      to.mul(2).sub(1),
-      d(0),
-      d(1)
-    );
-    return W = d(
-      b(W.x, I, Lo.x),
-      b(W.y, I, Lo.y)
-    ), W = i(io, W.oneMinus(), W), b(W.x, 1, W.y);
-  }, Eo = q.div(K), Xo = q.div(uo), Yo = _(
-    Y.div(K),
-    f,
-    1 - f
-  ), Zo = _(
-    M.div(uo),
-    f,
-    1 - f
+const buildGridNode = (uniforms) => {
+  const smoothstepVec2 = (low, high, x) => vec2(
+    smoothstep(low.x, high.x, x.x),
+    smoothstep(low.y, high.y, x.y)
   );
-  let Z = lo(Eo, Yo);
-  const co = lo(Xo, Zo);
-  Z = Z.mul(co.oneMinus());
-  const C = s(m.mul(0.5), f), Q = i(
-    L,
-    A.y,
-    i(w, A.y, A.z)
-  ), N = i(
-    L,
-    A.x,
-    i(w, A.z, A.x)
-  ), g = vo(A), B = _o(A), ko = i(
-    L,
-    g.y,
-    i(w, g.y, g.z)
-  ), Po = i(
-    L,
-    B.y,
-    i(w, B.y, B.z)
-  ), To = i(
-    L,
-    g.x,
-    i(w, g.z, g.x)
-  ), Uo = i(
-    L,
-    B.x,
-    i(w, B.z, B.x)
-  ), J = V(d(ko, Po)), Io = s(C, J), $ = s(J, f).mul(1.5), mo = s(C.sub($), 0), Oo = s(
-    C.add($),
-    mo.add(f)
+  const {
+    uPlane,
+    uScale,
+    uLineWidth,
+    uLineColor,
+    uMajorGridFactor,
+    uMajorLineWidth,
+    uMajorLineColor,
+    uAxisLineWidth,
+    uXAxisColor,
+    uYAxisColor,
+    uZAxisColor,
+    uCenterColor,
+    uOpacity,
+    uDebugWorldAB
+  } = uniforms;
+  const isXY = uPlane.equal(PLANE.XY);
+  const isZY = uPlane.equal(PLANE.ZY);
+  const rawWorldPos = positionWorld;
+  const planeWorldPos = select(
+    isXY,
+    vec3(rawWorldPos.x, rawWorldPos.y, 0),
+    select(
+      isZY,
+      vec3(0, rawWorldPos.y, rawWorldPos.z),
+      vec3(rawWorldPos.x, 0, rawWorldPos.z)
+    )
   );
-  let D = E(
-    mo,
-    Oo,
-    Q.abs()
+  const worldAB = select(
+    isXY,
+    vec2(planeWorldPos.x, planeWorldPos.y),
+    select(
+      isZY,
+      vec2(planeWorldPos.z, planeWorldPos.y),
+      vec2(planeWorldPos.x, planeWorldPos.z)
+    )
+  );
+  const safeScale = max(uScale, 1e-6);
+  const safeMajorFactor = max(uMajorGridFactor, 2);
+  const safeMajorScale = max(safeScale.mul(safeMajorFactor), 1e-6);
+  const pristineGrid = (gridUv, lineWidth) => {
+    const clampedLineWidth = clamp(lineWidth, 0, 1);
+    const uvDDXY = vec4(dFdx(gridUv), dFdy(gridUv));
+    const uvDeriv = vec2(
+      length(vec2(uvDDXY.x, uvDDXY.z)),
+      length(vec2(uvDDXY.y, uvDDXY.w))
+    );
+    const invertLine = clampedLineWidth.greaterThan(0.5);
+    const targetWidth = select(
+      invertLine,
+      clampedLineWidth.oneMinus(),
+      clampedLineWidth
+    );
+    const targetWidth2 = vec2(targetWidth, targetWidth);
+    const drawWidth = clamp(
+      targetWidth2,
+      uvDeriv,
+      vec2(0.5)
+    );
+    const lineAA = max(uvDeriv, vec2(1e-6)).mul(1.5);
+    let gridUV = abs(fract(gridUv).mul(2).sub(1));
+    gridUV = select(invertLine, gridUV, gridUV.oneMinus());
+    let grid2 = smoothstepVec2(
+      drawWidth.add(lineAA),
+      drawWidth.sub(lineAA),
+      gridUV
+    );
+    grid2 = grid2.mul(
+      clamp(targetWidth2.div(drawWidth), vec2(0), vec2(1))
+    );
+    const blendT = clamp(
+      uvDeriv.mul(2).sub(1),
+      vec2(0),
+      vec2(1)
+    );
+    grid2 = vec2(
+      mix(grid2.x, targetWidth, blendT.x),
+      mix(grid2.y, targetWidth, blendT.y)
+    );
+    grid2 = select(invertLine, grid2.oneMinus(), grid2);
+    return mix(grid2.x, 1, grid2.y);
+  };
+  const minorUv = worldAB.div(safeScale);
+  const majorUv = worldAB.div(safeMajorScale);
+  const minorLineWidthUv = clamp(
+    uLineWidth.div(safeScale),
+    WIDTH_EPSILON,
+    1 - WIDTH_EPSILON
+  );
+  const majorLineWidthUv = clamp(
+    uMajorLineWidth.div(safeMajorScale),
+    WIDTH_EPSILON,
+    1 - WIDTH_EPSILON
+  );
+  let minorGrid = pristineGrid(minorUv, minorLineWidthUv);
+  const majorGrid = pristineGrid(majorUv, majorLineWidthUv);
+  minorGrid = minorGrid.mul(majorGrid.oneMinus());
+  const axisHalfWidth = max(uAxisLineWidth.mul(0.5), WIDTH_EPSILON);
+  const axisCoordA = select(
+    isXY,
+    planeWorldPos.y,
+    select(isZY, planeWorldPos.y, planeWorldPos.z)
+  );
+  const axisCoordB = select(
+    isXY,
+    planeWorldPos.x,
+    select(isZY, planeWorldPos.z, planeWorldPos.x)
+  );
+  const worldPosDx = dFdx(planeWorldPos);
+  const worldPosDy = dFdy(planeWorldPos);
+  const axisDxA = select(
+    isXY,
+    worldPosDx.y,
+    select(isZY, worldPosDx.y, worldPosDx.z)
+  );
+  const axisDyA = select(
+    isXY,
+    worldPosDy.y,
+    select(isZY, worldPosDy.y, worldPosDy.z)
+  );
+  const axisDxB = select(
+    isXY,
+    worldPosDx.x,
+    select(isZY, worldPosDx.z, worldPosDx.x)
+  );
+  const axisDyB = select(
+    isXY,
+    worldPosDy.x,
+    select(isZY, worldPosDy.z, worldPosDy.x)
+  );
+  const axisDerivA = length(vec2(axisDxA, axisDyA));
+  const axisDrawWidthA = max(axisHalfWidth, axisDerivA);
+  const axisLineAAA = max(axisDerivA, WIDTH_EPSILON).mul(1.5);
+  const axisEdgeMinA = max(axisHalfWidth.sub(axisLineAAA), 0);
+  const axisEdgeMaxA = max(
+    axisHalfWidth.add(axisLineAAA),
+    axisEdgeMinA.add(WIDTH_EPSILON)
+  );
+  let axisMaskA = smoothstep(
+    axisEdgeMinA,
+    axisEdgeMaxA,
+    axisCoordA.abs()
   ).oneMinus();
-  D = D.mul(_(C.div(Io), 0, 1)), D = i(
-    Q.abs().lessThan(C.add($.mul(4))),
-    D,
+  axisMaskA = axisMaskA.mul(clamp(axisHalfWidth.div(axisDrawWidthA), 0, 1));
+  axisMaskA = select(
+    axisCoordA.abs().lessThan(axisHalfWidth.add(axisLineAAA.mul(4))),
+    axisMaskA,
     0
   );
-  const oo = V(d(To, Uo)), Ro = s(C, oo), eo = s(oo, f).mul(1.5), xo = s(C.sub(eo), 0), Vo = s(
-    C.add(eo),
-    xo.add(f)
+  const axisDerivB = length(vec2(axisDxB, axisDyB));
+  const axisDrawWidthB = max(axisHalfWidth, axisDerivB);
+  const axisLineAAB = max(axisDerivB, WIDTH_EPSILON).mul(1.5);
+  const axisEdgeMinB = max(axisHalfWidth.sub(axisLineAAB), 0);
+  const axisEdgeMaxB = max(
+    axisHalfWidth.add(axisLineAAB),
+    axisEdgeMinB.add(WIDTH_EPSILON)
   );
-  let S = E(
-    xo,
-    Vo,
-    N.abs()
+  let axisMaskB = smoothstep(
+    axisEdgeMinB,
+    axisEdgeMaxB,
+    axisCoordB.abs()
   ).oneMinus();
-  S = S.mul(_(C.div(Ro), 0, 1)), S = i(
-    N.abs().lessThan(C.add(eo.mul(4))),
-    S,
+  axisMaskB = axisMaskB.mul(clamp(axisHalfWidth.div(axisDrawWidthB), 0, 1));
+  axisMaskB = select(
+    axisCoordB.abs().lessThan(axisHalfWidth.add(axisLineAAB.mul(4))),
+    axisMaskB,
     0
   );
-  const P = s(C.mul(4.05), f), ho = s(J, f).mul(1.5), Ao = s(P.sub(ho), 0), Ho = s(
-    P.add(ho),
-    Ao.add(f)
-  ), qo = E(
-    Ao,
-    Ho,
-    Q.abs()
-  ), fo = s(oo, f).mul(1.5), Mo = s(P.sub(fo), 0), Ko = s(
-    P.add(fo),
-    Mo.add(f)
-  ), Qo = E(
-    Mo,
-    Ko,
-    N.abs()
+  const minorGapHalfWidth = max(axisHalfWidth.mul(4.05), WIDTH_EPSILON);
+  const minorGapLineAAA = max(axisDerivA, WIDTH_EPSILON).mul(1.5);
+  const minorGapEdgeMinA = max(minorGapHalfWidth.sub(minorGapLineAAA), 0);
+  const minorGapEdgeMaxA = max(
+    minorGapHalfWidth.add(minorGapLineAAA),
+    minorGapEdgeMinA.add(WIDTH_EPSILON)
   );
-  Z = Z.mul(qo).mul(Qo);
-  let v = p(n, Z);
-  v = b(v, p(u, 1), co);
-  const No = i(
-    w,
-    p(h, 1),
-    p(l, 1)
-  ), Jo = i(
-    L,
-    p(x, 1),
-    i(w, p(x, 1), p(h, 1))
+  const minorKeepA = smoothstep(
+    minorGapEdgeMinA,
+    minorGapEdgeMaxA,
+    axisCoordA.abs()
   );
-  v = b(v, Jo, S), v = b(v, No, D);
-  const $o = _(D.mul(S), 0, 1);
-  v = b(v, p(So, 1), $o);
-  const Co = p(1, 1, 1, Go), oe = v.mul(Co), po = yo(q), ee = p(po.x, po.y, 0, 1).mul(
-    Co
+  const minorGapLineAAB = max(axisDerivB, WIDTH_EPSILON).mul(1.5);
+  const minorGapEdgeMinB = max(minorGapHalfWidth.sub(minorGapLineAAB), 0);
+  const minorGapEdgeMaxB = max(
+    minorGapHalfWidth.add(minorGapLineAAB),
+    minorGapEdgeMinB.add(WIDTH_EPSILON)
   );
-  return i(zo.greaterThan(0.5), ee, oe);
+  const minorKeepB = smoothstep(
+    minorGapEdgeMinB,
+    minorGapEdgeMaxB,
+    axisCoordB.abs()
+  );
+  minorGrid = minorGrid.mul(minorKeepA).mul(minorKeepB);
+  let col = vec4(uLineColor, minorGrid);
+  col = mix(col, vec4(uMajorLineColor, 1), majorGrid);
+  const axisColorA = select(
+    isZY,
+    vec4(uZAxisColor, 1),
+    vec4(uXAxisColor, 1)
+  );
+  const axisColorB = select(
+    isXY,
+    vec4(uYAxisColor, 1),
+    select(isZY, vec4(uYAxisColor, 1), vec4(uZAxisColor, 1))
+  );
+  col = mix(col, axisColorB, axisMaskB);
+  col = mix(col, axisColorA, axisMaskA);
+  const centerMask = clamp(axisMaskA.mul(axisMaskB), 0, 1);
+  col = mix(col, vec4(uCenterColor, 1), centerMask);
+  const opacityMul = vec4(1, 1, 1, uOpacity);
+  const finalCol = col.mul(opacityMul);
+  const debugAB = fract(worldAB);
+  const debugCol = vec4(debugAB.x, debugAB.y, 0, 1).mul(
+    opacityMul
+  );
+  return select(uDebugWorldAB.greaterThan(0.5), debugCol, finalCol);
 };
 export {
-  Do as CHUNK_SIZE,
-  H as PLANE,
-  ve as ThreeInfiniteGrid
+  CHUNK_SIZE,
+  PLANE,
+  ThreeInfiniteGrid
 };

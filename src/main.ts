@@ -27,7 +27,10 @@ camera.position.set(10, 10, 10);
 scene.add(camera);
 
 //#region Renderer setup
-const renderer = new WebGPURenderer({ antialias: true });
+const renderer = new WebGPURenderer({
+  antialias: true,
+  logarithmicDepthBuffer: true,
+});
 renderer.setClearColor(new Color("#ffffff"));
 
 const handleResize = () => {
@@ -60,7 +63,9 @@ scene.add(cube);
 
 scene.add(ambientLight, directionalLight);
 
-const grid = new ThreeInfiniteGrid({});
+const grid = new ThreeInfiniteGrid({
+  debugWorldAB: true,
+});
 scene.add(grid);
 
 const gui = new GUI();
